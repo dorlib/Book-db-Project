@@ -1,33 +1,47 @@
-# Movie Database Management System
+# Book Database Management System
 
 <p align="center">
-    <img alt="Issues" src="https://img.shields.io/github/issues-raw/Shaigoldbourt22/DbProject"/>
-    <img alt="pull request" src="https://img.shields.io/github/issues-pr-closed/Shaigoldbourt22/DbProject"/>
-    <img alt="stars" src="https://img.shields.io/github/stars/Shaigoldbourt22/DbProject?style=social">
-    <img alt="updated" src="https://img.shields.io/github/last-commit/Shaigoldbourt22/DbProject">
-    <img alt="size" src="https://img.shields.io/github/repo-size/Shaigoldbourt22/DbProject" >
+    <img alt="Issues" src="https://img.shields.io/github/issues-raw/dorlib/Book-db-Project"/>
+    <img alt="Pull Requests" src="https://img.shields.io/github/issues-pr-closed/dorlib/Book-db-Project"/>
+    <img alt="Stars" src="https://img.shields.io/github/stars/dorlib/Book-db-Project?style=social">
+    <img alt="Last Commit" src="https://img.shields.io/github/last-commit/dorlib/Book-db-Project">
+    <img alt="Repo Size" src="https://img.shields.io/github/repo-size/dorlib/Book-db-Project">
 </p>
 
 ## Overview
 
-This project involves the creation of a movie-centered database management system (DBMS) using MySQL and Python. The system fetches data from The Movie Database (TMDB) API and stores it in a well-structured MySQL database. Additionally, the project includes five distinct database queries to analyze the stored data, focusing on specific aspects of the movie industry. While the project emphasizes backend development, a frontend design is documented to illustrate the intended application interface.
+This project involves the creation of a book-centered database management system (DBMS) using MySQL and Python. The system retrieves book data from the Open Library API and stores it in a well-structured MySQL database. In addition, the project implements six distinct SQL queries to analyze the stored data—focusing on publication years, subject distributions, and author contributions. Although the main focus is on backend data management and query processing, the documentation also includes a frontend design outline for the intended application interface.
 
 ## Features
 
-1. **Database Schema**: The database includes five tables: `movies`, `genres`, `persons`, `movie_genres`, and `movie_cast`. These tables store detailed information about movies, their genres, and cast/crew members.
+1. **Database Schema**:  
+   The database consists of five tables:
+   - **books** – Contains book details such as `book_id`, `title`, and `first_publish_year`.
+   - **authors** – Contains author details such as `author_id` and `name`.
+   - **subjects** – Contains subject information (with `subject_id` and `name`).
+   - **book_authors** – Resolves the many-to-many relationship between books and authors.
+   - **book_subjects** – Resolves the many-to-many relationship between books and subjects.
 
-2. **Data Population**:
+2. **Data Population**:  
+   - The system uses the Open Library API to retrieve book data across multiple subjects (e.g., fiction, fantasy, science, history, mystery, romance, biography, philosophy).
+   - The insertion process is designed to accumulate at least 10,000 rows in total across all tables.
 
-   - The system uses the TMDB API to retrieve movie data, genres, and credits.
-   - Over 5,000 records are populated across the tables.
-
-3. **Queries**:
-
-   - Two full-text search queries.
-   - Three complex queries involving nested subqueries, aggregations, and the `EXISTS` clause.
-
-4. **Database Optimizations**:
-   - Proper indexing and foreign key constraints for efficient query execution.
+3. **Queries**:  
+   - **Simple Queries:**  
+     - **Query 1:** Retrieve the 10 most recently published books along with one associated author.
+     - **Query 2:** Retrieve the top 10 oldest books for the subject “fiction.”
+     - **Query 3:** Retrieve books published in the year 2000.
+   - **Complex Queries:**  
+     - **Query 4:** For each author (with at least 5 books), find the subject in which they have published the most books.
+     - **Query 5:** For each subject, determine the decade with the highest number of publications.
+     - **Query 6:** For each subject, find the top author (by book count) and calculate the average publication year for that author’s books.
+   
+4. **Database Optimizations**:  
+   - Indexes are applied only on columns used by current queries to ensure efficient query execution:
+     - **`idx_books_first_publish_year`** on `books(first_publish_year)` – Helps Queries 1, 3, 5, and 6.
+     - **`idx_book_authors_author`** on `book_authors(author_id)` – Helps Queries 1, 4, and 6.
+     - **`idx_book_subjects_subject`** on `book_subjects(subject_id)` – Helps Queries 2, 5, and 6.
+     - **`idx_subjects_name`** on `subjects(name)` – Helps Query 2.
 
 ## Prerequisites
 
@@ -47,75 +61,68 @@ project-root/
 │   └── queries_execution.py      # Demonstrates query executions
 │
 ├── documentation/
-│   ├── user_manual.pdf           # Application functionality and design
-│   ├── system_docs.pdf           # Database schema and design rationale
+│   ├── answers.pdf           # theoretical questions
 │   └── mysql_and_user_password.txt # MySQL credentials
 │
 ├── requirements.txt              # Required Python packages
 └── name_and_id.txt               # Team member names and IDs
 ```
 
+
 ## Database Design
 
-The database consists of the following tables:
+The database schema is as follows:
 
-1. **movies**:
+1. **books**  
+   - **Columns:** `book_id` (PK), `title`, `first_publish_year`  
+   - **Description:** Stores essential information about each book.
 
-   - Stores basic movie details.
-   - Indexed by `movie_id` for fast lookups.
+2. **authors**  
+   - **Columns:** `author_id` (PK), `name`  
+   - **Description:** Contains details of each author.
 
-2. **genres**:
+3. **subjects**  
+   - **Columns:** `subject_id` (PK, auto-increment), `name` (unique)  
+   - **Description:** Categorizes books by subject.
 
-   - Stores genre information.
-   - Linked to movies via the `movie_genres` table.
+4. **book_authors**  
+   - **Columns:** `book_id` (FK), `author_id` (FK)  
+   - **Description:** Resolves the many-to-many relationship between books and authors.
 
-3. **persons**:
-
-   - Stores details of cast and crew members.
-
-4. **movie_genres**:
-
-   - Links movies to their respective genres.
-
-5. **movie_cast**:
-   - Links movies to cast and crew, specifying roles and character names.
+5. **book_subjects**  
+   - **Columns:** `book_id` (FK), `subject_id` (FK)  
+   - **Description:** Resolves the many-to-many relationship between books and subjects.
 
 ## Queries Implemented
 
-1. **Query 1**: Find the top 5 movies mentioning 'gangster' in their overview with the highest average rating, including genres
-2. **Query 2**: Find the top 5 most popular movies mentioning 'Action' in their overview, along with their genres and the number of actors in each movie
-3. **Query 3**: Find movies with the most diverse cast (actors from different genres)
-4. **Query 4**: Find the highest-rated movie in each genre, along with its rating, genre name, and popularity.
-5. **Query 5**: Find top 5 directors by average vote_average of the movies they directed
+1. **Query 1: 10 Most Recently Published Books**  
+   Retrieves the 10 newest books (by publication year) along with one associated author.
 
-# Index Strategy
+2. **Query 2: Top 10 Oldest Books for “fiction”**  
+   Retrieves the 10 oldest books (by publication year) that belong to the subject “fiction.”
 
-This project uses a set of carefully selected indexes to optimize query performance. Below is a summary of the indexes added to each table, their purpose, and justification:
+3. **Query 3: Books Published in 2000**  
+   Retrieves books published in the year 2000.
 
-| Table              | Index Name                        | Columns                    | Purpose                                                                                              | Justification                                                                                       |
-| ------------------ | --------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| **`movies`**       | `idx_overview`                   | `overview`                 | Full-text search for queries like `MATCH ... AGAINST` on movie descriptions.                         | Improves performance for text searches involving keywords (e.g., "gangster").                       |
-|                    | `idx_popularity`                 | `popularity`               | Filtering and sorting movies by popularity.                                                          | Optimizes queries that rank movies by popularity, often used in user-facing applications.           |
-|                    | `idx_vote_average`               | `vote_average`             | Filtering and sorting movies by average vote.                                                        | Improves performance for queries ranking movies by ratings.                                         |
-|                    | `idx_movies_vote_movie`          | `vote_average`, `movie_id` | Efficient sorting and grouping for queries involving ratings and movie ID.                           | Supports queries like finding the top-rated movies or aggregating results by movie ID.              |
-| **`movie_genres`** | `idx_movie_genres_genre_movie`   | `genre_id`, `movie_id`     | Efficient joins between movies and genres.                                                           | Essential for queries combining movie and genre information (e.g., highest-rated movies per genre). |
-| **`movie_cast`**   | `idx_cast_movie`                 | `movie_id`, `person_id`    | Optimizes joins with `persons` and grouping for queries about actors and directors.                  | Critical for queries fetching details about cast members or filtering by cast roles.                |
-|                    | `idx_cast_role`                  | `person_id`, `role`        | Efficient filtering for queries involving roles (e.g., actors or directors).                         | Improves performance of role-specific queries like finding directors or actors for a movie.         |
-| **`genres`**       | `idx_genre_id`                   | `genre_id`                 | Efficient joins with `movie_genres` for genre-specific queries.                                      | Ensures fast joins between genres and movie genres for filtering or aggregating by genre.           |
-| **`persons`**      | `idx_person_id`                  | `person_id`                | Optimizes joins with `movie_cast` for queries involving directors and cast members.                  | Supports fast lookups of directors or actors and their associated movies.                           |
+4. **Query 4: For Each Author, Find the Subject with the Most Books**  
+   Determines, for authors with at least 5 books, the subject in which they have the highest number of books (using aggregation and nested subqueries).
 
-### Key Points
+5. **Query 5: For Each Subject, Find the Decade with the Most Publications**  
+   Groups books by decade per subject and returns the decade with the highest count.
 
-- **Read Optimization:** These indexes are designed to enhance the performance of read-heavy operations such as `SELECT`, `JOIN`, `WHERE`, and `GROUP BY`.
-- **Write Performance Impact:** While indexes slightly slow down write operations (`INSERT`, `UPDATE`, `DELETE`), the tradeoff is acceptable given the read-heavy nature of the workload.
-- **Regular Monitoring:** Query performance should be monitored over time using tools like `EXPLAIN` and `information_schema.statistics` to ensure the indexes remain effective as the database grows.
+6. **Query 6: For Each Subject, Find the Top Author and Their Average Publish Year**  
+   Uses window functions to determine, for each subject, the top author (by book count) and calculates the average publication year for that author’s books.
 
-### Notes
+## Index Strategy
 
-- The `idx_overview` index is a full-text index and is crucial for queries that involve searching for specific text in the movie descriptions.
-- Composite indexes (e.g., `idx_movie_genres_genre_movie` and `idx_movies_vote_movie`) are used for optimizing queries that involve multiple columns for filtering, grouping, or sorting.
+The following indexes are applied to optimize the current queries:
 
-For any new queries, revisit this table to evaluate if additional indexes are needed.
+| Table              | Index Name                        | Columns                         | Query Benefit                                                                    |
+| ------------------ | --------------------------------- | ------------------------------- | -------------------------------------------------------------------------------- |
+| **books**          | `idx_books_first_publish_year`    | `first_publish_year`            | Speeds up filtering and ordering in Queries 1, 3, 5, and 6 (e.g., sorting books by year). |
+| **book_authors**   | `idx_book_authors_author`         | `author_id`                     | Optimizes joins and groupings by author in Queries 1, 4, and 6.                   |
+| **book_subjects**  | `idx_book_subjects_subject`       | `subject_id`                    | Improves joins on subject in Queries 2, 5, and 6.                                |
+| **subjects**       | `idx_subjects_name`               | `name`                          | Accelerates filtering for a specific subject (e.g., 'fiction') in Query 2.         |
 
 ## Setup and Usage
 

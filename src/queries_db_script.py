@@ -227,7 +227,6 @@ def query_6():
         ORDER BY subject_name;
     """)
     results = cursor.fetchall()
-    # Convert Decimal to float for avg_publish_year so the output is plain numeric.
     for row in results:
         subject_name, top_author, book_count, avg_publish_year = row
         print((subject_name, top_author, book_count, float(avg_publish_year)))

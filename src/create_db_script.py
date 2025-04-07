@@ -11,7 +11,6 @@ db_user = os.getenv('DB_USER')
 db_password = os.getenv('DB_PASSWORD')
 
 def create_database():
-    # Connect without specifying the database to create it first.
     connection = create_database_connection()
     cursor = connection.cursor()
     cursor.execute(f"CREATE DATABASE IF NOT EXISTS {db_name}")
