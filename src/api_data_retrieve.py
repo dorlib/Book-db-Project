@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
 from utils import create_database_connection
-import os
 import requests
 import time
 
